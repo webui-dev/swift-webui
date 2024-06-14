@@ -1,4 +1,4 @@
-import webui
+import SwiftWebUI
 
 let doc = """
 <!doctype html>
@@ -46,53 +46,48 @@ let doc = """
 </html>
 """
 
-func handleStr(e: UnsafeMutablePointer<webui_event_t>?) {
-	let str1 = webui_get_string(e)!
-	let str2 = webui_get_string_at(e, 1)!
+func handleStr(_ e: Event) {
+	let str1: String = try! getArg(e)
+	let str2: String = try! getArg(e, 1)
 
-	print("handleStr 1: \(String(cString: str1))") // Hello
-	print("handleStr 2: \(String(cString: str2))") // World
+	print("handleStr 1: \(str1)") // Hello
+	print("handleStr 2: \(str2)") // World
 }
 
-func handleInt(e: UnsafeMutablePointer<webui_event_t>?) {
-	let num1 = webui_get_int_at(e, 0)
-	let num2 = webui_get_int_at(e, 1)
-	let num3 = webui_get_int_at(e, 2)
+func handleInt(e: Event) {
+	let num1: Int = try! getArg(e)
+	let num2: Int = try! getArg(e, 1)
+	let num3: Int = try! getArg(e, 2)
 
 	print("handleInt 1: \(num1)") // 123
 	print("handleInt 2: \(num2)") // 456
 	print("handleInt 3: \(num3)") // 789
 }
 
-func handleBool(e: UnsafeMutablePointer<webui_event_t>?) {
-	let status1 = webui_get_bool(e)
-	let status2 = webui_get_bool_at(e, 1)
+func handleBool(e: Event) {
+	let status1: Bool = try! getArg(e)
+	let status2: Bool = try! getArg(e, 1)
 
 	print("handleBool 1: \(status1)") // true
 	print("handleBool 2: \(status2)") // false
 }
 
-func handleResp(e: UnsafeMutablePointer<webui_event_t>?) {
-	let count = webui_get_int(e)
-	webui_return_int(e, count * 2)
+func handleResp(e: Event) {
+	let count: Int = try! getArg(e)
+	response(e, count * 2)
 }
 
 // Create a new window.
-let win = webui_new_window()
+let win = newWindow()
 
 // Bind Swift functions.
-webui_bind(win, "handleStr", handleStr)
-webui_bind(win, "handleInt", handleInt)
-webui_bind(win, "handleBool", handleBool)
-webui_bind(win, "handleResp", handleResp)
+win.bind("handleStr", handleStr)
+win.bind("handleInt", handleInt)
+win.bind("handleBool", handleBool)
+win.bind("handleResp", handleResp)
 
 // Show html frontend.
-_ = doc.withCString { html in
-	webui_show(win, UnsafeMutablePointer(mutating: html))
-}
+try! win.show(doc)
 
 // Wait until all windows get closed.
-webui_wait()
-
-// Free resources (optional).
-webui_clean()
+wait()
