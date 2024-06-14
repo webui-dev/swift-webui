@@ -11,14 +11,23 @@ enum WebUIError: Error {
 public final class Window {
 	let id: Int
 
-	public init(_ webui_win: Int) {
+	init(_ webui_win: Int) {
 		id = webui_win
 	}
 
-	public func bind(_ element: String, _ cb: BindCallback) {
-		webui_bind(id, element, cb)
+	/// Binds a function to the WebUI window object or directly to a HTML elements click event.
+	/// Empty element means all events.
+	/// - Parameters:
+	///   - element: The name under which the function will be callable / the HTML elements ID.
+	///   - callback: The callback function.
+	public func bind(_ element: String, _ callback: BindCallback) {
+		webui_bind(id, element, callback)
 	}
 
+	/// Shows a window using embedded HTML, or a file.
+	/// If the window is already open, it will be refreshed.
+	/// - Parameter html: The HTML, URL, or a local file.
+	/// - Throws: `WebUIError.runtimeError` if showing the window was not successful.
 	public func show(_ html: String) throws {
 		if !(html.withCString { html in
 			webui_show(id, html)
@@ -27,35 +36,56 @@ public final class Window {
 		}
 	}
 
+	/// Closes the window. The window object will still exist.
 	public func close() {
 		webui_close(id)
 	}
 
+	/// Closes the window and free its memory resources.
 	public func destroy() {
 		webui_destroy(id)
 	}
 
+	/// Checks if window is running.
 	public func is_shown() -> Bool {
 		webui_is_shown(id)
 	}
 }
 
+/// Creates a new window object.
 public func newWindow() -> Window {
 	return Window(webui_new_window())
 }
 
+/// Creates a new window object using a specified id.
+public func newWindowId(_ id: Int) -> Window {
+	return Window(webui_new_window_id(id))
+}
+
+/// Gets a free window id that can be used with newWindowId.
+public func getNewWindowId() -> Int {
+	return webui_get_new_window_id()
+}
+
+/// Waits until all opened windows get closed.
 public func wait() {
 	webui_wait()
 }
 
+/// Closes all open windows. `webui_wait()` will return (break).
 public func exit() {
 	webui_exit()
 }
 
+/// Frees all memory resources. Should be called only at the end.
 public func clean() {
 	webui_clean()
 }
 
+/// Gets an argument passed from JavaScript.
+/// - Parameters:
+///   - event: The event object.
+///   - idx: The event object.
 public func getArg<T>(_ event: Event, _ idx: Int = 0) throws -> T {
 	let arg_count = webui_get_count(event)
 	if idx >= arg_count {
@@ -75,6 +105,10 @@ public func getArg<T>(_ event: Event, _ idx: Int = 0) throws -> T {
 	throw WebUIError.runtimeError("error: failed to get argument at index `\(idx)`")
 }
 
+/// Returns a response to JavaScript.
+/// - Parameters:
+///   - event: The event object.
+///   - value: The response value.
 public func response<T>(_ event: Event, _ value: T) {
 	if value is String {
 		(value as! String).withCString { str in
