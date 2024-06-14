@@ -103,7 +103,7 @@ public func clean() {
 /// Gets an argument passed from JavaScript.
 /// - Parameters:
 ///   - event: The event object.
-///   - idx: The event object.
+///   - idx: The argument position starting from 0.
 public func getArg<T>(_ event: Event, _ idx: Int = 0) throws -> T {
 	let arg_count = webui_get_count(event)
 	if idx >= arg_count {
