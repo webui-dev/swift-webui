@@ -123,3 +123,13 @@ public func response<T>(_ event: Event, _ value: T) {
 	}
 	// TODO: automatically encode other types as JSON string.
 }
+
+public func setTLSCertificate(_ certifcatePem: String, _ privateKeyPem: String) throws {
+	if !(certifcatePem.withCString { certPem in
+		privateKeyPem.withCString { keyPem in
+			webui_set_tls_certificate(certPem, keyPem)
+		}
+	}) {
+		throw WebUIError.runtimeError("error: failed to set TLS certificate")
+	}
+}
