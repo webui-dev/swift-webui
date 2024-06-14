@@ -13,6 +13,8 @@ var webuiCSettings: [CSetting] = [
 var webuiLinkerSettings: [LinkerSetting] = [
 	.linkedLibrary("Ws2_32", .when(platforms: [.windows])),
 	.linkedLibrary("Ole32", .when(platforms: [.windows])),
+	.linkedFramework("WebKit", .when(platforms: [.macOS])),
+	.linkedFramework("Cocoa", .when(platforms: [.macOS])),
 ]
 
 if ProcessInfo.processInfo.environment["USE_TLS"] != nil {
