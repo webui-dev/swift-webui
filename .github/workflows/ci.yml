@@ -31,7 +31,8 @@ jobs:
       - name: Build
         # Current encounters errors in civetweb.
         continue-on-error: true
-        run: swift build
+        run: |
+          swift build && exit 0 || echo "::error:: Build step failed"
 
   windows:
     runs-on: windows-latest
