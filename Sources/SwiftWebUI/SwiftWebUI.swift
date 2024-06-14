@@ -50,6 +50,24 @@ public final class Window {
 	public func is_shown() -> Bool {
 		webui_is_shown(id)
 	}
+
+	/// Sets windows root folder.
+	/// - Parameter path: The local folder full path.
+	public func setRootFolder(_ path: String) throws {
+		if !(path.withCString { p in
+			webui_set_root_folder(id, p)
+		}) {
+			throw WebUIError.runtimeError("error: failed to set root folder for window `\(id)`")
+		}
+	}
+
+	/// Runs JavaScript without waiting for the response.
+	/// - Parameter script: The JavaScript to run.
+	public func run(_ script: String) {
+		script.withCString { script in
+			webui_run(id, script)
+		}
+	}
 }
 
 /// Creates a new window object.
@@ -122,6 +140,17 @@ public func response<T>(_ event: Event, _ value: T) {
 		webui_return_float(event, value as! Double)
 	}
 	// TODO: automatically encode other types as JSON string.
+}
+
+/// Sets the web-server root folder path for all windows.
+/// Should be used before `webui_show()`.
+/// - Parameter path: The full path to the local folder.
+public func setRootFolder(_ path: String) throws {
+	if !(path.withCString { p in
+		webui_set_default_root_folder(p)
+	}) {
+		throw WebUIError.runtimeError("error: failed to set default root folder")
+	}
 }
 
 public func setTLSCertificate(_ certifcatePem: String, _ privateKeyPem: String) throws {

@@ -72,5 +72,10 @@ let package = Package(
 			dependencies: ["SwiftWebUI"],
 			path: "Examples/CallSwiftFromJS"
 		),
+		.executableTarget(
+			name: "ServeAFolder",
+			dependencies: ["SwiftWebUI"],
+			path: "Examples/ServeAFolder"
+		),
 	]
 )
