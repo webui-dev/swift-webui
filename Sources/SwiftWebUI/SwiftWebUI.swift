@@ -9,8 +9,8 @@ enum WebUIError: Error {
 
 var bindCallbacks: [Int: BindCallback<Any>] = [:]
 
-func swiftEventHandler(_ event: UnsafeMutablePointer<webui_event_t>?) {
-	let e = event?.pointee
+func swiftEventHandler(_ webui_event_ptr: UnsafeMutablePointer<webui_event_t>?) {
+	let e = webui_event_ptr?.pointee
 	guard let window = e?.window,
 	      let eventType = e?.event_type,
 	      let element = e?.element,
@@ -19,7 +19,7 @@ func swiftEventHandler(_ event: UnsafeMutablePointer<webui_event_t>?) {
 	else {
 		return
 	}
-	let swiftEvent = Event(
+	let event = Event(
 		window: window,
 		eventType: eventType,
 		element: element,
@@ -27,12 +27,12 @@ func swiftEventHandler(_ event: UnsafeMutablePointer<webui_event_t>?) {
 		bindId: bindId
 	)
 	// Call user callback function.
-	let result = try! bindCallbacks[swiftEvent.bindId]?(swiftEvent)
+	let result = try! bindCallbacks[event.bindId]?(event)
 	if result is Void {
 		return
 	}
 	guard let result = result else { return }
-	try! swiftEvent.response(result)
+	try! event.response(result)
 }
 
 public final class Window {
