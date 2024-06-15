@@ -74,7 +74,7 @@ func handleBool(e: Event) {
 
 func handleResp(e: Event) {
 	let count: Int = try! e.getArg()
-	response(e, count * 2)
+	e.response(count * 2)
 }
 
 // Create a new window.
