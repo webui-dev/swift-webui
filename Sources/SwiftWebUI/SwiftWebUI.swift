@@ -93,7 +93,7 @@ public final class Window {
 public struct Event {
 	let cStruct: webui_event_t
 	let id: Int
-	public let window: Int
+	public let window: Window
 	public let eventType: Int
 	public let element: String
 	public let bindId: Int
@@ -101,7 +101,7 @@ public struct Event {
 	init(window: Int, eventType: Int, element: UnsafeMutablePointer<CChar>?, eventNumber: Int, bindId: Int) {
 		cStruct = webui_event_t(window: window, event_type: eventType, element: element, event_number: eventNumber, bind_id: bindId)
 		id = eventNumber
-		self.window = window
+		self.window = Window(window)
 		self.eventType = eventType
 		self.element = String(cString: element!)
 		self.bindId = bindId
