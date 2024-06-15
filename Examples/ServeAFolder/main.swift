@@ -3,8 +3,8 @@ import SwiftWebUI
 let win1 = newWindowId(1)
 let win2 = newWindowId(2)
 
-func switchToSecondPage(_: Event) {
-	try! win1.show("second.html")
+func switchToSecondPage(_ e: Event) {
+	try! e.window.show("second.html")
 }
 
 func showSecondWindow(_: Event) {
