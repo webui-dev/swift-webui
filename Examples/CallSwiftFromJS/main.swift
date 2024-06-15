@@ -46,18 +46,18 @@ let doc = """
 </html>
 """
 
-func handleStr(_ e: Event) {
-	let str1: String = try! getArg(e)
-	let str2: String = try! getArg(e, 1)
+func handleStr(e: Event) {
+	let str1: String = try! e.getArg()
+	let str2: String = try! e.getArg(1)
 
 	print("handleStr 1: \(str1)") // Hello
 	print("handleStr 2: \(str2)") // World
 }
 
 func handleInt(e: Event) {
-	let num1: Int = try! getArg(e)
-	let num2: Int = try! getArg(e, 1)
-	let num3: Int = try! getArg(e, 2)
+	let num1: Int = try! e.getArg()
+	let num2: Int = try! e.getArg(1)
+	let num3: Int = try! e.getArg(2)
 
 	print("handleInt 1: \(num1)") // 123
 	print("handleInt 2: \(num2)") // 456
@@ -65,15 +65,15 @@ func handleInt(e: Event) {
 }
 
 func handleBool(e: Event) {
-	let status1: Bool = try! getArg(e)
-	let status2: Bool = try! getArg(e, 1)
+	let status1: Bool = try! e.getArg()
+	let status2: Bool = try! e.getArg(1)
 
 	print("handleBool 1: \(status1)") // true
 	print("handleBool 2: \(status2)") // false
 }
 
 func handleResp(e: Event) {
-	let count: Int = try! getArg(e)
+	let count: Int = try! e.getArg()
 	response(e, count * 2)
 }
 

@@ -106,6 +106,30 @@ public struct Event {
 		self.element = String(cString: element!)
 		self.bindId = bindId
 	}
+
+	/// Gets an argument passed from JavaScript.
+	/// - Parameters:
+	///   - event: The event object.
+	///   - idx: The argument position starting from 0.
+	public func getArg<T>(_ idx: Int = 0) throws -> T {
+		var cEvent = cStruct
+		let arg_count = webui_get_count(&cEvent)
+		if idx >= arg_count {
+			throw WebUIError.runtimeError("error: argument index out of range (index: \(idx), argument count: \(arg_count))")
+		}
+		if T.self == String.self {
+			let str = webui_get_string_at(&cEvent, idx)!
+			return String(cString: str) as! T
+		} else if T.self == Int.self {
+			return Int(webui_get_int_at(&cEvent, idx)) as! T
+		} else if T.self == Bool.self {
+			return webui_get_bool_at(&cEvent, idx) as! T
+		} else if T.self == Double.self {
+			return webui_get_float_at(&cEvent, idx) as! T
+		}
+		// TODO: automatically decode other types.
+		throw WebUIError.runtimeError("error: failed to get argument at index `\(idx)`")
+	}
 }
 
 /// Creates a new window object.
@@ -136,30 +160,6 @@ public func exit() {
 /// Frees all memory resources. Should be called only at the end.
 public func clean() {
 	webui_clean()
-}
-
-/// Gets an argument passed from JavaScript.
-/// - Parameters:
-///   - event: The event object.
-///   - idx: The argument position starting from 0.
-public func getArg<T>(_ event: Event, _ idx: Int = 0) throws -> T {
-	var cEvent = event.cStruct
-	let arg_count = webui_get_count(&cEvent)
-	if idx >= arg_count {
-		throw WebUIError.runtimeError("error: argument index out of range (index: \(idx), argument count: \(arg_count))")
-	}
-	if T.self == String.self {
-		let str = webui_get_string_at(&cEvent, idx)!
-		return String(cString: str) as! T
-	} else if T.self == Int.self {
-		return Int(webui_get_int_at(&cEvent, idx)) as! T
-	} else if T.self == Bool.self {
-		return webui_get_bool_at(&cEvent, idx) as! T
-	} else if T.self == Double.self {
-		return webui_get_float_at(&cEvent, idx) as! T
-	}
-	// TODO: automatically decode other types.
-	throw WebUIError.runtimeError("error: failed to get argument at index `\(idx)`")
 }
 
 /// Returns a response to JavaScript.
