@@ -72,9 +72,9 @@ func handleBool(e: Event) {
 	print("handleBool 2: \(status2)") // false
 }
 
-func handleResp(e: Event) {
+func handleResp(e: Event) -> Int {
 	let count: Int = try! e.getArg()
-	e.response(count * 2)
+	return count * 2
 }
 
 // Create a new window.

@@ -1,13 +1,13 @@
 import Foundation
 import webui
 
-public typealias BindCallback = (Event) -> Void
-
-var callbacks: [Int: BindCallback] = [:]
+public typealias BindCallback<T> = (Event) throws -> T
 
 enum WebUIError: Error {
 	case runtimeError(String)
 }
+
+var bindCallbacks: [Int: BindCallback<Any>] = [:]
 
 func swiftEventHandler(_ event: UnsafeMutablePointer<webui_event_t>?) {
 	let e = event?.pointee
@@ -27,7 +27,12 @@ func swiftEventHandler(_ event: UnsafeMutablePointer<webui_event_t>?) {
 		bindId: bindId
 	)
 	// Call user callback function.
-	callbacks[swiftEvent.bindId]?(swiftEvent)
+	let result = try! bindCallbacks[swiftEvent.bindId]?(swiftEvent)
+	if result is Void {
+		return
+	}
+	guard let result = result else { return }
+	try! swiftEvent.response(result)
 }
 
 public final class Window {
@@ -43,9 +48,9 @@ public final class Window {
 	///   - element: The name under which the function will be callable / the HTML elements ID.
 	///   - callback: The callback function.
 	// public func bind(_ element: String, _ callback: BindCallbackSwift) {
-	public func bind(_ element: String, _ callback: @escaping BindCallback) {
+	public func bind<T>(_ element: String, _ callback: @escaping BindCallback<T>) {
 		let id = webui_bind(id, element, swiftEventHandler)
-		callbacks[id] = callback
+		bindCallbacks[id] = callback
 	}
 
 	/// Shows a window using embedded HTML, or a file.
@@ -135,7 +140,7 @@ public struct Event {
 	/// - Parameters:
 	///   - event: The event object.
 	///   - value: The response value.
-	public func response<T>(_ value: T) {
+	func response<T>(_ value: T) throws {
 		var cEvent = cStruct
 		if value is String {
 			(value as! String).withCString { str in webui_return_string(&cEvent, str) }
@@ -145,8 +150,13 @@ public struct Event {
 			webui_return_bool(&cEvent, value as! Bool)
 		} else if value is Double {
 			webui_return_float(&cEvent, value as! Double)
+		} else {
+			// TODO: automatically encode other types as JSON string.
+			throw WebUIError.runtimeError("""
+			error: failed to return response value `\(value)` with type `\(type(of: value))`.
+			Pass a type `String`, `Int`, `Bool`, `Double`, or in case of Objects and Arrays JSON encoded values.
+			""")
 		}
-		// TODO: automatically encode other types as JSON string.
 	}
 }
 
