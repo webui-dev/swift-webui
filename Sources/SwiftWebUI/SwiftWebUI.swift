@@ -113,9 +113,7 @@ public struct Event {
 	}
 
 	/// Gets an argument passed from JavaScript.
-	/// - Parameters:
-	///   - event: The event object.
-	///   - idx: The argument position starting from 0.
+	/// - Parameter idx: The argument position starting from 0.
 	public func getArg<T>(_ idx: Int = 0) throws -> T {
 		var cEvent = cStruct
 		let arg_count = webui_get_count(&cEvent)
@@ -137,9 +135,7 @@ public struct Event {
 	}
 
 	/// Returns a response to JavaScript.
-	/// - Parameters:
-	///   - event: The event object.
-	///   - value: The response value.
+	/// - Parameter value: The response value.
 	func response<T>(_ value: T) throws {
 		var cEvent = cStruct
 		if value is String {
@@ -201,6 +197,13 @@ public func setRootFolder(_ path: String) throws {
 	}
 }
 
+/// Set the SSL/TLS certificate and the private key content, both in PEM format.
+/// This works only with `webui-2-secure` library. If set empty WebUI will generate
+/// a self-signed certificate.
+/// - Parameters:
+///   - certificate_pem: The SSL/TLS certificate content in PEM format.
+///   - private_key_pem: The private key content in PEM format.
+/// - Throws: `WebUIError.runtimeError` if the certifacte or the key are invalid.
 public func setTLSCertificate(_ certifcatePem: String, _ privateKeyPem: String) throws {
 	if !(certifcatePem.withCString { certPem in
 		privateKeyPem.withCString { keyPem in
