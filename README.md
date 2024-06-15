@@ -48,7 +48,7 @@ try! win.show(doc)
 wait()
 ```
 
-Find more examples in the [`examples/`](https://github.com/webui-dev/swift-webui/tree/main/examples) directory.
+Find more examples in the [`Examples/`](https://github.com/webui-dev/swift-webui/tree/main/Examples) directory.
 
 After cloning the repository, examples can be run from the repository root.
 
