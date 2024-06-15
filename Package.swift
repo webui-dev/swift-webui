@@ -59,6 +59,7 @@ let package = Package(
 			sources: [
 				"src/webui.c",
 				"src/civetweb/civetweb.c",
+				"src/webview/wkwebview.m",
 			],
 			cSettings: webuiCSettings,
 			linkerSettings: webuiLinkerSettings
